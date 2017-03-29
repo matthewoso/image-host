@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script
+  src="https://code.jquery.com/jquery-3.1.1.js"
+  integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+
+	<nav>
+		<a href="/login.html">Log In</a>
+		<a href="/upload.html">Upload</a>
+	</nav>
+	<div id="gallery"></div>
+
+	<script>
+	// When this page loads, retrieve the gallery of images from the backend and build them into the HTML
+	$.get('/api/gallery', function(res) {
+		// We have to parse, since we stringified on the backend
+		var images = JSON.parse(res);
+		for (var i = 0; i < images.length; i++) {
+			// for each image...
+			// build a new div
+			var container = $("<div></div>");
+			// create an img and paragraph in that div
+			container.append($(`<img src="${images[i].url}">`));
+			container.append('<button id="'+i+'" class="displayImage">Display Image</button>'); //added id to reference image for single image display page
+			container.append('<button id="'+i+'" class="voteImage">Vote for Image</button>'); //add id to tag vote to image
+			container.append("<p>Author: " + images[i].author + "</p>");
+			container.append('<div class="votes" id="bob'+i+'"> Votes: ' + images[i].vote + "<div>"); //add div to update votes with Id for reference
+			$('#gallery').append(container);
+		}
+
+			$('.displayImage').click(displayImage);
+			$('.voteImage').click(addToVote);
+	});
+
+	function displayImage (event) { //function to send image Id to backend and jump to solo image page
+		var imageId = event.target.id; 
+		// console.log(event);
+		//console.log(imageId);
+		var link = "/image/" + imageId; //build url
+		window.location.href = "http://localhost:8080" + link;	//jump to page	
+	};
+
+	function addToVote (event) { //add to vote on listener
+		var imageId = event.target.id;
+		// console.log(imageId);
+		$.post("http://localhost:8080/vote", {  //post vote to back end
+			imageId: imageId
+		}, function(res) { 
+			//console.log(res);
+			$( "div#bob" + imageId).text("Votes: " + res);	//update vote display
+			// window.location.href = 	"http://localhost:8080";
+		});
+	}
+
+	</script>
+</body>
+</html>
