@@ -123,7 +123,7 @@ app.get("/image/:selectedImageId", function(req, res) { //backend of single imag
 			return;
 		}
 		s = data.toString(); //string the data
-		s = s.replace("###", images[imageId].url); //replace the missing reference
+		s = s.replace(/###/g, images[imageId].url); //replace the missing reference
 		res.send(s); //rebuild the page with the url for the image selected
 	});
 });
